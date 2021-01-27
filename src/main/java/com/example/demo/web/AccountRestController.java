@@ -1,10 +1,11 @@
 package com.example.demo.web;
 
+import com.example.demo.entities.AppRole;
 import com.example.demo.entities.AppUser;
 import com.example.demo.service.AccountService;
+import lombok.Data;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,8 +18,27 @@ public class AccountRestController {
     }
 
      @GetMapping("/users")
-    private List<AppUser> appUserList(){
+     public List<AppUser> appUserList(){
         return  accountService.USER_LIST();
     }
+     @PostMapping("/users")
+    public  AppUser saveUser( @RequestBody AppUser appUser){
+           return accountService.addNewUser(appUser);
+    }
 
+    @PostMapping("/roles")
+    public  AppRole saveRolz( @RequestBody AppRole appRole){
+        return accountService.addNewRole(appRole);
+    }
+
+    @PostMapping("/addRoleToUser")
+    void   addRoleToUser ( @RequestBody RoleUserFrom  roleUserFrom ){
+         accountService.addRoleToUser(roleUserFrom.getUserName() , roleUserFrom.getRoleName());
+    }
+
+}
+@Data
+class RoleUserFrom{
+  private  String userName;
+  private  String roleName;
 }
