@@ -27,13 +27,13 @@ public class AccountRestController {
     }
 
     @PostMapping("/roles")
-    public  AppRole saveRolz( @RequestBody AppRole appRole){
+    public  AppRole saveRole( @RequestBody AppRole appRole){
         return accountService.addNewRole(appRole);
     }
 
     @PostMapping("/addRoleToUser")
     void   addRoleToUser ( @RequestBody RoleUserFrom  roleUserFrom ){
-         accountService.addRoleToUser(roleUserFrom.getUserName() , roleUserFrom.getRoleName());
+          accountService.addRoleToUser(roleUserFrom.getUserName() , roleUserFrom.getRoleName());
     }
 
 }
