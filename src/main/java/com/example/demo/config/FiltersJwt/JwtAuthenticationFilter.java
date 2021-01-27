@@ -2,6 +2,7 @@ package com.example.demo.config.FiltersJwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -62,9 +65,31 @@ public class JwtAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
             .withClaim("roles" ,user.getAuthorities().stream().map(aga ->aga.getAuthority()).collect(Collectors.toList())) // convert getAuthority to String list by Streams
             .sign(algorithm); // Signature
 
-
-        //  sand  the JWT generated to Client by Http Header
-        response.setHeader("Authorization", JwtAccessToken);
+          //  sand  the JWT generated to Client by Http Header
+         // response.setHeader("Authorization", JwtAccessToken);
          // after user sand a request to  ex:http://localhost:8085/login   first time
+
+//--------------------------------------------
+        // Create JWT Token  de Refrichement in case something (password ,.....)change regarding Auth1
+        // when the  JwtAccessToken expired and instead of  the user sand login name and password
+        // he should just sand  JwtRefreshToken below  and this Filter sand him a new  JwtAccessToken
+        // after make sure tha the  last JwtAccessToken is expired by checking the <<black list>>
+
+        String JwtRefreshToken= JWT.create()
+                .withSubject(user.getUsername())
+                .withExpiresAt( new Date(System.currentTimeMillis()+(60*60*1000)))  // Expiration in 60 minuts
+                .withIssuer(request.getRequestURI())  // severU rl
+                .sign(algorithm); // Signature
+
+        Map<String,String> idToken= new HashMap<>();
+        idToken.put("access-token",JwtAccessToken);
+        idToken.put("refresh-token",JwtRefreshToken);
+
+        //sand the JWT Token generated(access & refresh) to Client by Http Body
+            response.setContentType("application/json");
+          new ObjectMapper().writeValue(response.getOutputStream() , idToken);
+
+
+
     }
 }
