@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.demo.config.JwtUuil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,7 +32,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         {
 
           // ex: visa de client
-           String  authorizationToken=httpRequest.getHeader("Authorization");
+           String  authorizationToken=httpRequest.getHeader(JwtUuil.AUTH_HEDER);
 
           // System.out.println(" ***********Authorization Filter **************");
           //System.out.println("jwt:"+authorizationToken );
@@ -42,7 +43,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
                          String jwt=authorizationToken.substring(7);
 
-                         Algorithm  algorithm= Algorithm.HMAC256("ZakSecrit010");
+                         Algorithm  algorithm= Algorithm.HMAC256(JwtUuil.SECRET);
                          JWTVerifier jwtVerifier= JWT.require(algorithm).build();
                          //after dycripte jwt we get  (username, rols,......) if there is no issue with JWT
                          DecodedJWT decodedJWT = jwtVerifier.verify(jwt);

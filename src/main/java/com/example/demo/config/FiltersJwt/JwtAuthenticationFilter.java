@@ -2,6 +2,7 @@ package com.example.demo.config.FiltersJwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.example.demo.config.JwtUuil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,12 +56,12 @@ public class JwtAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
         // generate JWT by auth.JWT maven
 
         // and also and algorithm fo make signature RSA
-        Algorithm  algorithm= Algorithm.HMAC256("ZakSecrit010");
+        Algorithm  algorithm= Algorithm.HMAC256(JwtUuil.SECRET);
 
         // Create JWT Token =Header+Payload+Signature
     String JwtAccessToken= JWT.create()
             .withSubject(user.getUsername())
-            .withExpiresAt( new Date(System.currentTimeMillis()+(5*60*1000)))  // Expiration in 5 minuts
+            .withExpiresAt( new Date(System.currentTimeMillis()+JwtUuil.EXPARE_ACCESS_TOKEN))  // Expiration in 5 minuts
             .withIssuer(request.getRequestURI())  // severU rl
             .withClaim("roles" ,user.getAuthorities().stream().map(aga ->aga.getAuthority()).collect(Collectors.toList())) // convert getAuthority to String list by Streams
             .sign(algorithm); // Signature
@@ -77,7 +78,7 @@ public class JwtAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
 
         String JwtRefreshToken= JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt( new Date(System.currentTimeMillis()+(5*60*1000)))  // Expiration in 60 minuts
+                .withExpiresAt( new Date(System.currentTimeMillis()+JwtUuil.EXPARE_REFRESH_TOKEN))  // Expiration in 60 minuts
                 .withIssuer(request.getRequestURL().toString())  // severU rl
                 .sign(algorithm); // Signature
 

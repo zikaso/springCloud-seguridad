@@ -49,6 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     grantedAuthorities.add( new SimpleGrantedAuthority(appRole.getRolename()));
                 });
                 return new User(appUser.getUsername() , appUser.getPassword(),grantedAuthorities);
+
             }
         });
 

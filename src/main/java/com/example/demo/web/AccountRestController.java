@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.demo.config.JwtUuil;
 import com.example.demo.entities.AppRole;
 import com.example.demo.entities.AppUser;
 import com.example.demo.service.AccountService;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,11 +61,19 @@ public class AccountRestController {
           accountService.addRoleToUser(roleUserFrom.getUserName() , roleUserFrom.getRoleName());
     }
 
+    //get user connected info
+     @GetMapping("/profile")
+    public  AppUser profile(Principal principal){
+            return  accountService.loadUserByUserName(principal.getName());
+    }
+
+
+
   @GetMapping("/refreshToken")
   public  void refreshToken(HttpServletRequest request , HttpServletResponse response) throws IOException {
 
 
-      String  authorizationToken=request.getHeader("Authorization");
+      String  authorizationToken=request.getHeader(JwtUuil.AUTH_HEDER);
       // System.out.println(" ***********Authorization Filter **************");
       //System.out.println("jwt:"+authorizationToken );
       if(authorizationToken !=null && authorizationToken.startsWith("Bearer "))
@@ -72,7 +82,7 @@ public class AccountRestController {
 
               String jwt=authorizationToken.substring(7);
 
-              Algorithm algorithm= Algorithm.HMAC256("ZakSecrit010");
+              Algorithm algorithm= Algorithm.HMAC256(JwtUuil.SECRET);
               JWTVerifier jwtVerifier= JWT.require(algorithm).build();
               //after dycripte jwt we get  (username, rols,......) if there is no issue with JWT
               DecodedJWT decodedJWT = jwtVerifier.verify(jwt);
@@ -85,7 +95,7 @@ public class AccountRestController {
               // Create JWT Token =Header+Payload+Signature
               String JwtAccessToken= JWT.create()
                       .withSubject(appUser.getUsername())
-                      .withExpiresAt( new Date(System.currentTimeMillis()+(5*60*1000)))  // Expiration in 5 minuts
+                      .withExpiresAt( new Date(System.currentTimeMillis()+JwtUuil.EXPARE_REFRESH_TOKEN))  // Expiration in 5 minuts
                       .withIssuer(request.getRequestURI())  // severU rl
                       .withClaim("roles" ,appUser.getAppRoles().stream().map(r ->r.getRolename()).collect(Collectors.toList())) // convert getAuthority to String list by Streams
                       .sign(algorithm); // Signature
