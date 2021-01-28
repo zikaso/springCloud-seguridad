@@ -65,9 +65,9 @@ public class JwtAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
             .withClaim("roles" ,user.getAuthorities().stream().map(aga ->aga.getAuthority()).collect(Collectors.toList())) // convert getAuthority to String list by Streams
             .sign(algorithm); // Signature
 
-          //  sand  the JWT generated to Client by Http Header
-         // response.setHeader("Authorization", JwtAccessToken);
-         // after user sand a request to  ex:http://localhost:8085/login   first time
+          // sand  the JWT generated to Client by Http Header
+          // response.setHeader("Authorization", JwtAccessToken);
+          // after user sand a request to  ex:http://localhost:8085/login   first time
 
 //--------------------------------------------
         // Create JWT Token  de Refrichement in case something (password ,.....)change regarding Auth1
@@ -77,8 +77,8 @@ public class JwtAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
 
         String JwtRefreshToken= JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt( new Date(System.currentTimeMillis()+(60*60*1000)))  // Expiration in 60 minuts
-                .withIssuer(request.getRequestURI())  // severU rl
+                .withExpiresAt( new Date(System.currentTimeMillis()+(5*60*1000)))  // Expiration in 60 minuts
+                .withIssuer(request.getRequestURL().toString())  // severU rl
                 .sign(algorithm); // Signature
 
         Map<String,String> idToken= new HashMap<>();
@@ -88,8 +88,6 @@ public class JwtAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
         //sand the JWT Token generated(access & refresh) to Client by Http Body
             response.setContentType("application/json");
           new ObjectMapper().writeValue(response.getOutputStream() , idToken);
-
-
 
     }
 }

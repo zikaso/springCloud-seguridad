@@ -1,11 +1,13 @@
 package com.example.demo.config;
 
 import com.example.demo.config.FiltersJwt.JwtAuthenticationFilter;
+import com.example.demo.config.FiltersJwt.JwtAuthorizationFilter;
 import com.example.demo.entities.AppUser;
 import com.example.demo.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +20,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,19 +62,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
          //** using sessions in mode stateLess
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
+      // add intepcerture  for all client request and check it by these Jwt Filters
         http.addFilter( new JwtAuthenticationFilter(authenticationManagerBean()));
+        http.addFilterBefore( new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        // disable check for  iframe in html page    // just for H2 console
+        // check user roles
+        //http.authorizeRequests().antMatchers(HttpMethod.POST ,"/users/**").hasAnyAuthority("ADMIN");
+       // http.authorizeRequests().antMatchers(HttpMethod.GET ,"/users/**").hasAnyAuthority("USER");
+
+
+
+        // disable check for  iframe in html page    // just for H2 console and  refreshToken and  login
         http.headers().frameOptions().disable();
 
-        http.authorizeRequests().antMatchers("/h2-console/**").permitAll();
+        http.authorizeRequests().antMatchers("/h2-console/**","/refreshToken/**","/login/**").permitAll();
 
         // allow access to all resources without authenticated
        //  http.authorizeRequests().anyRequest().permitAll();
 
         // required an  login form access
          //http.formLogin();
+
+
 
         // allow access to all resources with authenticated
         http.authorizeRequests().anyRequest().authenticated();
