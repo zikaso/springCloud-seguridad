@@ -58,7 +58,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                          UsernamePasswordAuthenticationToken authenticationToken =
                                  new UsernamePasswordAuthenticationToken(username,null,authorities);
 
-                        // now told to Spring Security to login the user
+                        //  ADD to Spring Security   the user and his roles
                          SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
                         // if it's oki -> go to the next Filter
